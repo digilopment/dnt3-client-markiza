@@ -35,8 +35,13 @@ $adresa 			= $rest->post("adresa");
 $sprava 			= $rest->post("sprava");
 $suhlas 			= $rest->post("suhlas");
 
+var_dump($data['article']['embed']);
 
-$prijemcovia = array("thomas.doubek@gmail.com");
+if($data['article']['embed']){
+	$prijemcovia = array("thomas.doubek@gmail.com", $data['article']['embed']);
+}else{
+	$prijemcovia = array("thomas.doubek@gmail.com";
+}
 
 
 if($data['meta_settings']['keys']['gc_secret_key']['show'] == 1 && $data['meta_settings']['keys']['gc_site_key']['show'] == 1){
