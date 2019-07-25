@@ -35,8 +35,6 @@ $adresa 			= $rest->post("adresa");
 $sprava 			= $rest->post("sprava");
 $suhlas 			= $rest->post("suhlas");
 
-var_dump($data['article']['embed']);
-
 if($data['article']['embed']){
 	$prijemcovia = array("thomas.doubek@gmail.com", $data['article']['embed']);
 }else{
