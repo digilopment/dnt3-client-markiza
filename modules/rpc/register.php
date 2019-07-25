@@ -2,12 +2,26 @@
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 
+
+function reArrayFiles(&$file_post) {
+	$file_ary = array();
+	$file_count = count($file_post['name']);
+	$file_keys = @array_keys($file_post);
+	for ($i=0; $i<$file_count; $i++) {
+		foreach ($file_keys as $key) {
+			$file_ary[$i][$key] = $file_post[$key][$i];
+		}
+	}
+	return $file_ary;
+}
+
 $rest 				= new Rest;
 $db					= new Db;
 $dntMailer			= new Mailer;
 
 $postId				= $rest->webhook(4);
 $data 				= Frontend::get(false, $postId);
+$formName			= $data['article']['name'];
 $siteKey 			= $data['meta_settings']['keys']['gc_site_key']['value']; 
 $secretKey 			= $data['meta_settings']['keys']['gc_secret_key']['value'];
 $gc 				= new GoogleCaptcha($siteKey, $secretKey);
@@ -16,13 +30,14 @@ $gc 				= new GoogleCaptcha($siteKey, $secretKey);
 $meno 				= $rest->post("meno");
 $priezvisko 		= $rest->post("priezvisko");
 $email 				= $rest->post("email");
-$adresa 			= $rest->post("tel_c");
-$meno 				= $rest->post("adresa");
+$tel_c 				= $rest->post("tel_c");
+$adresa 			= $rest->post("adresa");
 $sprava 			= $rest->post("sprava");
 $suhlas 			= $rest->post("suhlas");
 
 
 $prijemcovia = array("thomas.doubek@gmail.com");
+
 
 if($data['meta_settings']['keys']['gc_secret_key']['show'] == 1 && $data['meta_settings']['keys']['gc_site_key']['show'] == 1){
 	$NO_CAPTCHA = 0;
@@ -35,58 +50,74 @@ if($data['meta_settings']['keys']['gc_secret_key']['show'] == 1 && $data['meta_s
 }else{
 	$NO_CAPTCHA = 1;
 }
-
-if(isset($_POST['odoslat'])){
+//var_dump($data['meta_settings']['keys']['vendor_email']['value']);
+if(!empty($meno) && !empty($priezvisko)){
 	if($gc->getResult() || $NO_CAPTCHA){
 		$attachment = "";
 		
-		$filePath = "dnt-view/data/external-uploads/";
-		if(isset($_FILES['file']) ){  
-			$dntUpload = new Upload($_FILES['file']); 
+		$myPath = "dnt-view/data/external-uploads/";
+		$file_ary = reArrayFiles($_FILES['file']);
+		foreach ($file_ary as $file) {
+			$dntUpload = new Upload($file); 
+			//pracuje s ajaxom VIDEA
 			if ($dntUpload->uploaded) {
+				$dntUpload->file_new_name_body = Vendor::getId()."_".md5(time())."_o";
 			   // save uploaded image with no changes
-			   $dntUpload->image_resize = true;
-			   $dntUpload->image_convert = 'jpg';
-			   $dntUpload->image_x = 800;
-			   //$dntUpload->image_max_width = 800;   
-			   $dntUpload->image_ratio_y = true;
-			   $dntUpload->Process($filePath);
+			   $dntUpload->Process($myPath);
 			   if ($dntUpload->processed) {
-				 $CUSTOM = json_encode(var_export($_FILES['file'], true));
-				 $attachment =  "".WWW_PATH."".$filePath."".$dntUpload->file_dst_name."";
+				 $RESPONSE = 1;
+				 $UPLOADED = 1;
+				 //$attachment[] =  "<a href='".WWW_PATH.$myPath.$dntUpload->file_dst_name."' >".$dntUpload->file_dst_name."</a>";
+				 $attachment[] =  WWW_PATH.$myPath.$dntUpload->file_dst_name."\n";
 			   } else {
-				 $attachment = "";
+				 $RESPONSE = 0;
+				 $UPLOADED = 0;
 			   }
 			}
 		}
-		
+		$prilohy = @implode("<br/>", $attachment);
 		
 		//EMAIL TEMPLATE		
 		$msg = 
 			'<html><head></head><body>
-			
 			<h3>Kontaktné údaje</h3>
-			<b>Formulár:</b>: '.$THIS_NAZOV.'<br/>
+			<b>Formulár:</b>: '.$formName.'<br/>
 			<b>Meno</b>: '.$meno.'<br/>
 			<b>Priezvisko</b>: '.$priezvisko.'<br/>
 			<b>Email</b>: '.$email.'<br/>
 			<b>Tel.č</b>: '.$tel_c .'<br/>
 			<b>Adresa</b>: '.$adresa.'<br/>
 			<b>Správa</b>: '.$sprava.'<br/>
-			<br/>
-			'.$attachment.'
+			<b>Prílohy:</b><br/>
+			'.$prilohy.'
 			</body>
 		</html>';
-	
-		$table								= "dnt_stihacka_user";
 		
-		$insertedData["`type`"] 			= "competitor-user-".$postId;
+		//$msh = "SSS";
+		
+		
+		
+		$senderEmail 	= $data['meta_settings']['keys']['vendor_email']['value'];
+		
+		$dntMailer->set_recipient($prijemcovia);
+		$dntMailer->set_msg($msg);
+		$dntMailer->set_subject($formName);
+		$dntMailer->set_sender_name("Markíza");
+		$dntMailer->set_sender_email($senderEmail);
+		$dntMailer->sent_email();
+		
+		//$msg = mysql_real_escape_string($msg);
+	
+		$table								= "dnt_registred_users";
+		
+		$insertedData["`type`"] 			= Dnt::name_url($formName)."-".$postId;
 		$insertedData["`vendor_id`"] 		= Vendor::getId();
 		$insertedData["`datetime_creat`"] 	= Dnt::datetime();
 		
 		
 		$insertedData["`name`"] 			= $meno;
 		$insertedData["`surname`"] 			= $priezvisko;
+		$insertedData["`content`"] 			= $msg;
 		
 		$insertedData["`session_id`"] 		= uniqid();
 		
@@ -98,10 +129,9 @@ if(isset($_POST['odoslat'])){
 		$insertedData["`podmienky`"] 		= 1;
 		$insertedData["`status`"] 			= 1;
 		
-		
-		$insertedData["`content`"] 		= $ans;
+	
 		$insertedData["`ip_adresa`"] 	= Dnt::get_ip();
-		$insertedData["`img`"] 			= $attachment;
+		//$insertedData["`img`"] 			= $prilohy;
 		
 		$db->dbTransaction();
 			$db->insert($table, $insertedData);
@@ -110,20 +140,11 @@ if(isset($_POST['odoslat'])){
 		
 	
 		
-		$senderEmail 	= $data['meta_tree']['keys']['email_sender']['value'];
-		$messageTitle 	= "Ďakujeme za email";
-			
-		$dntMailer->set_recipient(array($prijemcovia));
-		$dntMailer->set_msg($msg);
-		$dntMailer->set_subject($messageTitle);
-		$dntMailer->set_sender_name($senderEmail);
-		$dntMailer->set_sender_email($senderEmail);
-		$dntMailer->sent_email();
 	
 	
 		$RESPONSE 		= 1;
 		$CUSTOM 		= "done";
-		$ATTACHMENT 	= $attachment;
+		$ATTACHMENT 	= "";
 		//$CUSTOM = "done";
 	}else{
 		$RESPONSE 	= 2;
