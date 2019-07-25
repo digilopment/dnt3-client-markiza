@@ -40,7 +40,7 @@ var_dump($data['article']['embed']);
 if($data['article']['embed']){
 	$prijemcovia = array("thomas.doubek@gmail.com", $data['article']['embed']);
 }else{
-	$prijemcovia = array("thomas.doubek@gmail.com";
+	$prijemcovia = array("thomas.doubek@gmail.com");
 }
 
 
