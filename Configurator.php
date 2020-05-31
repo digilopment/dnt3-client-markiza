@@ -1,5 +1,11 @@
 <?php
 
+namespace DntView\Layout;
+
+use DntLibrary\App\Autoloader;
+use DntLibrary\Base\Vendor;
+use DntLibrary\Base\Webhook;
+
 class Configurator
 {
 
@@ -23,6 +29,9 @@ class Configurator
             //DETAIL
             'article_view' => array_merge(
                     array(), array('{alphabet}/detail/{digit}/{alphabet}')
+            ),
+            'default' => array_merge(
+                    array(), array('404')
             ),
             //AUTOREDIRECT
             'auto_redirect' => array_merge(

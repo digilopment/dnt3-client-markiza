@@ -1,4 +1,9 @@
 <?php
+
+use DntLibrary\Base\Dnt;
+use DntLibrary\Base\Frontend;
+use DntLibrary\Base\MultyLanguage;
+
 $data = Frontend::get();
 $FORM_BASE_VALUE = array();
 foreach (array_keys($data['meta_tree']['keys']) as $key) {
@@ -8,6 +13,15 @@ foreach (array_keys($data['meta_tree']['keys']) as $key) {
             $keyName = str_replace('name', 'meno', $keyName);
             $keyName = str_replace('surmeno', 'priezvisko', $keyName);
             $FORM_BASE_VALUE[$keyName] = $data['meta_tree']['keys'][$key];
+        }
+    }
+}
+
+$FORM_CUSTOM_VALUE = array();
+foreach (array_keys($data['meta_tree']['keys']) as $key) {
+    if (Dnt::in_string("form_custom", $key)) {
+        if ($data['meta_tree']['keys'][$key]['show'] == 1) {
+            $FORM_CUSTOM_VALUE[$key] = $data['meta_tree']['keys'][$key];
         }
     }
 }
@@ -24,8 +38,10 @@ foreach (explode(',', str_replace('-', ',', Dnt::name_url($accept))) as $format)
     }
 }
 $extensions = join(',', $final);
+$extensions = str_replace(',', '|', $extensions);
 ?>
-<style>      
+<script src="http://sbg-corialsk-11-2019.localhost/dnt3-winprizes/dnt-view/layouts/team4tourism-tpl1/js/additional-methods.min.js"></script>
+<style>    
 .registration_form .progressUpload h4{
     padding: 15px 0px;
 }
@@ -52,7 +68,6 @@ $extensions = join(',', $final);
     -o-transition: width .6s ease;
     transition: width .6s ease;
 }
-
 /*
 .registration_form .loader {
 	border: 16px solid #f3f3f3;
@@ -72,7 +87,6 @@ $extensions = join(',', $final);
 }
 */
 </style>
-<script src="http://sbg-corialsk-11-2019.localhost/dnt3-winprizes/dnt-view/layouts/team4tourism-tpl1/js/additional-methods.min.js"></script>
 <!-- EMBED BEGIN -->
 <?php  ob_start(); ?>
 <p entity_part="5329" rel="editable">
@@ -87,6 +101,37 @@ $extensions = join(',', $final);
    Tešíme sa na vás!
    Výhercovia budú vybraní a kontaktovaní na základe výberu internej komisie organizátora.<br/>
 </p>
+<style>
+<?php if($data['meta_tree']['keys']['color']['show'] == 1){ ?>
+.registration_form .btn-primary {
+    color: #fff;
+    background-color: <?php echo $data['meta_tree']['keys']['color']['value']; ?>;
+    border-color: <?php echo $data['meta_tree']['keys']['color']['value']; ?>;
+}
+.registration_form .progress-bar {
+    background-color: <?php echo $data['meta_tree']['keys']['color']['value']; ?>;
+}
+.registration_form .progress {
+    box-shadow: 0 0 0 <?php echo $data['meta_tree']['keys']['color']['value']; ?>;
+    border:1px solid <?php echo $data['meta_tree']['keys']['color']['value']; ?>;
+}
+.registration_form.sutaze-a-odkazy h3 {
+    color: <?php echo $data['meta_tree']['keys']['color']['value']; ?>;
+}
+.registration_form .progressUpload .progress-bar {
+    background-color: <?php echo $data['meta_tree']['keys']['color']['value']; ?>;
+}
+.registration_form .progressUpload .progress {
+    border: 1px solid <?php echo $data['meta_tree']['keys']['color']['value']; ?>;
+}
+<?php }?>
+<?php if($data['meta_tree']['keys']['color_error']['show'] == 1){ ?>
+.tvn-form .error {
+    color: <?php echo $data['meta_tree']['keys']['color_error']['value']; ?>;
+}
+<?php } ?>
+</style>
+<script src="/media/3.0/core/jquery/js/additional-methods.min.js"></script>
 <script>
 $(document).ready(function() {
  $(".checkbox-line").css("border-bottom", "1px solid #eee");
@@ -124,10 +169,21 @@ $(document).ready(function() {
    <?php 
       } 
       ?>
+                  
+   <?php foreach($FORM_CUSTOM_VALUE as $key => $form){
+      ?>
+   <?php echo $key; ?>: {
+    required: true,
+    minlength: 1
+   },
+   <?php 
+      } 
+      ?>
+              
    <?php if($data['meta_tree']['keys']['form_user_image_1']['show'] == 1 && $extensions){ ?>
-   file: {
-    required: false,
-    extension: "<?php echo $extensions; ?>"
+   "file[]": {
+    required: <?php echo ($extensions) ? 'true' : 'false' ?>,
+    extension: "<?php echo $extensions; ?>",
    },
    <?php } ?>
 
@@ -170,11 +226,16 @@ $(document).ready(function() {
    <?php foreach($FORM_BASE_VALUE as $key => $form){ ?>
    <?php echo $key; ?>: "^ Toto pole je povinné",
    <?php } ?>
+       
+   <?php foreach($FORM_CUSTOM_VALUE as $key => $form){ ?>
+   <?php echo $key; ?>: "^ Toto pole je povinné",
+   <?php } ?>
 
 
     <?php if($data['meta_tree']['keys']['form_user_image_1']['show'] == 1 && $extensions){ ?>
-   file: {
-       extension: "Povolený je len upload súborov v zozname." 
+   "file[]": {
+       extension: "Povolený je len upload súborov v zozname.",
+       required: "Prosím vložte prílohu"
     },
    <?php } ?>
    <?php if($data['meta_tree']['keys']['message']['show'] == 1){ ?>
@@ -279,6 +340,18 @@ $(document).ready(function() {
    <form class="col-md-12 tvn-form" id="registration_form" method="POST" enctype="multipart/form-data" novalidate="novalidate">
        
       <?php foreach($FORM_BASE_VALUE as $key => $form){ ?>
+       
+       <fieldset class="form-group">
+         <label for="<?php echo $key; ?>">
+         <span class="star">*
+         </span><?php echo $form['value']; ?>
+         </label>
+         <input name="<?php echo $key; ?>" class="form-control" id="<?php echo $key; ?>" placeholder="<?php echo $form['value']; ?>" type="text">
+      </fieldset>
+     
+        <?php } ?> 
+       
+        <?php foreach($FORM_CUSTOM_VALUE as $key => $form){ ?>
        
        <fieldset class="form-group">
          <label for="<?php echo $key; ?>">

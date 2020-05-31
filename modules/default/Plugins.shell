@@ -11,15 +11,15 @@
       <VAR id="tpl" value="layout" />
    </PLUGIN>
 
-        <PLUGIN name="form">
-           <VAR id="id" value="form" />
+        <PLUGIN name="default">
+           <VAR id="id" value="default" />
            <VAR id="layout" value="TOP-CONTENT" />
            <VAR id="level" value="local" />
            <VAR id="cache" value="1H" />
            <VAR id="cache_id" value="" />
            <VAR id="compress" value="0" />
            <VAR id="type" value="mdl" />
-           <VAR id="tpl" value="form" />
+           <VAR id="tpl" value="default" />
         </PLUGIN>
 
 </MODULE>

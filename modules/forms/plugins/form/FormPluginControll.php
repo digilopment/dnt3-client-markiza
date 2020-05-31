@@ -1,5 +1,11 @@
 <?php
 
+namespace DntView\Layout\Modul\Plugin;
+
+use DntLibrary\App\Plugin;
+use DntLibrary\Base\Frontend;
+use DntView\Layout\App\MarkizaForm;
+
 class FormPluginControll extends Plugin
 {
 

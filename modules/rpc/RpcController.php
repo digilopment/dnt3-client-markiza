@@ -1,5 +1,12 @@
 <?php
 
+namespace DntView\Layout\Modul;
+
+use DntLibrary\App\Autoloader;
+use DntLibrary\App\BaseController;
+use DntLibrary\Base\DB;
+use DntLibrary\Base\Rest;
+
 class RpcController extends BaseController
 {
 
@@ -11,7 +18,7 @@ class RpcController extends BaseController
     public function __construct()
     {
         $this->rest = new Rest();
-        $this->db = new Db();
+        $this->db = new DB();
         $this->autoloader = new Autoloader();
     }
 

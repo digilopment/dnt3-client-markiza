@@ -1,6 +1,13 @@
 <?php
 
-class FormPluginControll extends Plugin
+namespace DntView\Layout\Modul\Plugin;
+
+use DntLibrary\App\Plugin;
+use DntLibrary\Base\Frontend;
+use DntLibrary\Base\Settings;
+use DntView\Layout\App\MarkizaForm;
+
+class DefaultPluginControll extends Plugin
 {
 
     protected $loc = __FILE__;
@@ -11,12 +18,12 @@ class FormPluginControll extends Plugin
     {
         $this->markiza = new MarkizaForm();
         $this->frontend = new Frontend();
+        $this->settings = new Settings();
     }
 
     public function run()
     {
-        $html = $this->layout($this->loc, 'form', false, true);
-        print $this->markiza->getHybsaTemplate($html);
+        $this->layout($this->loc, $this->modul(), false, false);
     }
 
 }

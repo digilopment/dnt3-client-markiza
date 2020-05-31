@@ -1,5 +1,12 @@
 <?php
 
+namespace DntView\Layout\Modul;
+
+use DntLibrary\App\BaseController;
+use DntLibrary\Base\ArticleView;
+use DntLibrary\Base\Dnt;
+use DntLibrary\Base\Frontend;
+
 class FormsController extends BaseController
 {
 

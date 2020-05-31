@@ -1,5 +1,7 @@
 <?php
 
+namespace DntView\Layout\App;
+
 class MarkizaForm
 {
 

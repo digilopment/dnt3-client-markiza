@@ -1,22 +1,28 @@
 <?php
 
-class FormPluginControll extends Plugin
+namespace DntView\Layout\Modul;
+
+use DntLibrary\App\BaseController;
+use DntLibrary\Base\Dnt;
+use DntLibrary\Base\Frontend;
+
+class DefaultController extends BaseController
 {
 
-    protected $loc = __FILE__;
-    protected $markiza;
+    protected $dnt;
     protected $frontend;
 
     public function __construct()
     {
-        $this->markiza = new MarkizaForm();
+        $this->dnt = new Dnt();
         $this->frontend = new Frontend();
     }
 
     public function run()
     {
-        $html = $this->layout($this->loc, 'form', false, true);
-        print $this->markiza->getHybsaTemplate($html);
+        header("HTTP/1.0 404 Not Found");
+        $data = $this->frontend->get();
+        $this->modulConfigurator($data, $this->modul());
     }
 
 }

@@ -1,5 +1,9 @@
 <?php
 
+namespace DntView\Layout\Modul\Install;
+
+use DntLibrary\Base\Vendor;
+
 class MetaServices
 {
 
@@ -73,6 +77,19 @@ class MetaServices
             '`post_id`' => $postId,
             '`service`' => $service,
             '`vendor_id`' => Vendor::getId(),
+            '`key`' => "form_custom_input_1",
+            '`value`' => 'Voliteľné pole',
+            '`content_type`' => "text",
+            '`cat_id`' => "3",
+            '`description`' => "Input voliteľné pole",
+            '`order`' => "550",
+            '`show`' => "0",
+        );
+
+        $insertedData[] = array(
+            '`post_id`' => $postId,
+            '`service`' => $service,
+            '`vendor_id`' => Vendor::getId(),
             '`key`' => "message",
             '`value`' => "Odkaz pre nás",
             '`content_type`' => "text",
@@ -81,7 +98,7 @@ class MetaServices
             '`order`' => "600",
             '`show`' => "1",
         );
-        
+
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
@@ -94,7 +111,7 @@ class MetaServices
             '`order`' => "700",
             '`show`' => "1",
         );
-        
+
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
@@ -107,7 +124,7 @@ class MetaServices
             '`order`' => "800",
             '`show`' => "0",
         );
-        
+
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
@@ -120,7 +137,7 @@ class MetaServices
             '`order`' => "850",
             '`show`' => "0",
         );
-        
+
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
@@ -133,7 +150,7 @@ class MetaServices
             '`order`' => "900",
             '`show`' => "1",
         );
-        
+
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
@@ -146,7 +163,7 @@ class MetaServices
             '`order`' => "1000",
             '`show`' => "1",
         );
-        
+
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
@@ -159,7 +176,7 @@ class MetaServices
             '`order`' => "1100",
             '`show`' => "0",
         );
-        
+
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
@@ -172,7 +189,7 @@ class MetaServices
             '`order`' => "1200",
             '`show`' => "0",
         );
-        
+
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
@@ -185,7 +202,7 @@ class MetaServices
             '`order`' => "1300",
             '`show`' => "1",
         );
-        
+
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
@@ -198,8 +215,8 @@ class MetaServices
             '`order`' => "1400",
             '`show`' => "1",
         );
-        
-     
+
+
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
@@ -212,7 +229,7 @@ class MetaServices
             '`order`' => "1500",
             '`show`' => "1",
         );
-        
+
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
@@ -224,6 +241,45 @@ class MetaServices
             '`description`' => "Perex článku",
             '`order`' => "1600",
             '`show`' => "1",
+        );
+        
+        $insertedData[] = array(
+            '`post_id`' => $postId,
+            '`service`' => $service,
+            '`vendor_id`' => Vendor::getId(),
+            '`key`' => "color",
+            '`value`' => "Farba warnings",
+            '`content_type`' => "text",
+            '`cat_id`' => "3",
+            '`description`' => "Perex článku",
+            '`order`' => "1700",
+            '`show`' => "0",
+        );
+        
+         $insertedData[] = array(
+            '`post_id`' => $postId,
+            '`service`' => $service,
+            '`vendor_id`' => Vendor::getId(),
+            '`key`' => "color_error",
+            '`value`' => "#ff0000",
+            '`content_type`' => "color",
+            '`cat_id`' => "3",
+            '`description`' => "Farba chyby vo formulári",
+            '`order`' => "1700",
+            '`show`' => "0",
+        );
+         
+          $insertedData[] = array(
+            '`post_id`' => $postId,
+            '`service`' => $service,
+            '`vendor_id`' => Vendor::getId(),
+            '`key`' => "color",
+            '`value`' => "#000000",
+            '`content_type`' => "color",
+            '`cat_id`' => "3",
+            '`description`' => "Farba formuláru",
+            '`order`' => "1800",
+            '`show`' => "0",
         );
 
         return $insertedData;

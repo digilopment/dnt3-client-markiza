@@ -1,5 +1,11 @@
 <?php
 
+use DntLibrary\Base\AdminContent;
+use DntLibrary\Base\ArticleView;
+use DntLibrary\Base\Frontend;
+use DntLibrary\Base\MultyLanguage;
+use DntLibrary\Base\Vendor;
+
 
 include "dnt-view/layouts/".Vendor::getLayout()."/tpl_functions.php";
 $data = Frontend::get();

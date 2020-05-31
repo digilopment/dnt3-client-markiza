@@ -1,5 +1,17 @@
 <?php
 
+namespace DntView\Layout\Modul;
+
+use DntLibrary\App\Render;
+use DntLibrary\Base\DB;
+use DntLibrary\Base\Dnt;
+use DntLibrary\Base\Frontend;
+use DntLibrary\Base\GoogleCaptcha;
+use DntLibrary\Base\Mailer;
+use DntLibrary\Base\Rest;
+use DntLibrary\Base\Upload;
+use DntLibrary\Base\Vendor;
+
 class CompetitionRegister
 {
 
@@ -79,7 +91,7 @@ class CompetitionRegister
         $db = $this->db;
         $dntMailer = $this->dntMailer;
 
-        $form_base_name = $rest->post("form_base_name") ? $rest->post("form_base_name") : $rest->post("meno") ;
+        $form_base_name = $rest->post("form_base_name") ? $rest->post("form_base_name") : $rest->post("meno");
         $form_base_surname = $rest->post("form_base_surname") ? $rest->post("form_base_name") : $rest->post("priezvisko");
         $form_base_adresa = $rest->post("form_base_adresa") ? $rest->post("form_base_adresa") : $rest->post("adresa");
         $form_base_email = $rest->post("form_base_email") ? $rest->post("form_base_email") : $rest->post("email");

@@ -1,23 +1,4 @@
-Running JSDOC on ["lib/", "lib/plugins/"]
-parsing /Users/aaronquint/Sites/__active/sammy/lib/sammy.js
-parsing /Users/aaronquint/Sites/__active/sammy/lib/plugins/sammy.cache.js
-parsing /Users/aaronquint/Sites/__active/sammy/lib/plugins/sammy.data_location_proxy.js
-parsing /Users/aaronquint/Sites/__active/sammy/lib/plugins/sammy.ejs.js
-parsing /Users/aaronquint/Sites/__active/sammy/lib/plugins/sammy.form.js
-parsing /Users/aaronquint/Sites/__active/sammy/lib/plugins/sammy.googleanalytics.js
-parsing /Users/aaronquint/Sites/__active/sammy/lib/plugins/sammy.haml.js
-parsing /Users/aaronquint/Sites/__active/sammy/lib/plugins/sammy.handlebars.js
-parsing /Users/aaronquint/Sites/__active/sammy/lib/plugins/sammy.json.js
-parsing /Users/aaronquint/Sites/__active/sammy/lib/plugins/sammy.meld.js
-parsing /Users/aaronquint/Sites/__active/sammy/lib/plugins/sammy.mustache.js
-parsing /Users/aaronquint/Sites/__active/sammy/lib/plugins/sammy.nested_params.js
-parsing /Users/aaronquint/Sites/__active/sammy/lib/plugins/sammy.oauth2.js
-parsing /Users/aaronquint/Sites/__active/sammy/lib/plugins/sammy.path_location_proxy.js
-parsing /Users/aaronquint/Sites/__active/sammy/lib/plugins/sammy.pure.js
-parsing /Users/aaronquint/Sites/__active/sammy/lib/plugins/sammy.storage.js
-parsing /Users/aaronquint/Sites/__active/sammy/lib/plugins/sammy.template.js
-parsing /Users/aaronquint/Sites/__active/sammy/lib/plugins/sammy.title.js
-parsing /Users/aaronquint/Sites/__active/sammy/lib/plugins/sammy.tmpl.js
+
 [
   [
     {
