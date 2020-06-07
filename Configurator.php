@@ -49,6 +49,9 @@ class Configurator
             'tvn_app' => array_merge(
                     array(), $this->webhook->getSitemapModules('tvn_app')
             ),
+            'subscriber' => array_merge(
+                    array(), $this->webhook->getSitemapModules('subscriber')
+            ),
         );
         return $modulesRegistrator;
     }
@@ -67,6 +70,9 @@ class Configurator
             'tvn_app' => array(
                 'service_name' => 'Tvn App',
                 'sql' => ''
+            ),
+            'subscriber' => array(
+                'service_name' => 'Služba na prihlasenie a odhlasenie z email listingu',
             ),
         );
     }
