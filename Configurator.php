@@ -17,6 +17,17 @@ class Configurator
         $this->webhook = new Webhook();
     }
 
+    public function vendorConfig()
+    {
+        return [
+            'apiKey' => '20Mar15Kiza',
+            'voyoService' => 'https://backend.voyo.sk/lbackend/eshop/nl_sync.php',
+            'serviceLogin' => 'mklepoch',
+            'servicePsswd' => 'martin 650',
+            'decryptedKey' => 'Voyo2020MarkizaDevTem',
+        ];
+    }
+
     public function modulesRegistrator()
     {
         $modulesRegistrator = array(
