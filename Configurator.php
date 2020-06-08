@@ -25,7 +25,7 @@ class Configurator
             'serviceLogin' => 'mklepoch',
             'servicePsswd' => 'martin 650',
             'decryptedKey' => 'Voyo2020MarkizaDevTem',
-            'unsubscribeDomain' => 'http://odhlasenie.tdoubek.beta.markiza.sk/?type=microsite_odhlasenie',
+            'unsubscribeDomain' => 'https://odhlasenie.markiza.sk/',
         ];
     }
 
