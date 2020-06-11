@@ -25,6 +25,7 @@ class Configurator
             'serviceLogin' => 'mklepoch',
             'servicePsswd' => 'martin 650',
             'decryptedKey' => 'Voyo2020MarkizaDevTem',
+            'sentMailPerRequest' => 10,
             'unsubscribeDomain' => 'https://odhlasenie.markiza.sk/',
         ];
     }
