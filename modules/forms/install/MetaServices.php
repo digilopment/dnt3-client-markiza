@@ -12,6 +12,20 @@ class MetaServices
     public function init($postId, $service)
     {
         $defaultContent = $this->content;
+        
+        $insertedData[] = array(
+            '`post_id`' => $postId,
+            '`service`' => $service,
+            '`vendor_id`' => Vendor::getId(),
+            '`key`' => "dynamic_subject",
+            '`value`' => 'Voliteľný text',
+            '`content_type`' => "text",
+            '`cat_id`' => "3",
+            '`description`' => "Dynamický predmet",
+            '`order`' => "50",
+            '`show`' => "0",
+        );
+        
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
