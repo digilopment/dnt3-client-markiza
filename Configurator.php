@@ -27,6 +27,8 @@ class Configurator
             'decryptedKey' => 'Voyo2020MarkizaDevTem',
             'sentMailPerRequest' => 50,
             'unsubscribeDomain' => 'https://odhlasenie.markiza.sk/',
+            'rempService' => 'https://crm.cms.markiza.sk/api/v1/user-segments/users?code=newsletters-gdpr-ready',
+            'rempBareerToken' => '496f34c82af4bfc72a663595602757e3',
         ];
     }
 
