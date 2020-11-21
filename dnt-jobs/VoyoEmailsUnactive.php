@@ -10,7 +10,7 @@ use DntLibrary\Base\Dnt;
 class VoyoEmailsUnactiveJob
 {
 
-    const UNACTIVE_PERIOD = 4; //WEEK
+    const UNACTIVE_PERIOD = 27; //DAYS
 
     protected $emailCatId = 91;
     protected $db;
@@ -68,7 +68,7 @@ class VoyoEmailsUnactiveJob
 
     protected function sentEmails()
     {
-        $query = "SELECT email FROM `dnt_mailer_mails` WHERE  `vendor_id` = '" . $this->vendor->getId() . "'  AND  cat_id = '" . $this->emailCatId . "' AND `show` = 1 AND datetime_creat < DATE_SUB(NOW(),INTERVAL " . self::UNACTIVE_PERIOD . " WEEK)";
+        $query = "SELECT email FROM `dnt_mailer_mails` WHERE  `vendor_id` = '" . $this->vendor->getId() . "'  AND  cat_id = '" . $this->emailCatId . "' AND `show` = 1 AND datetime_creat < DATE_SUB(NOW(),INTERVAL " . self::UNACTIVE_PERIOD . " DAY)";
         $this->countAllEmails = $this->db->num_rows($query);
         if ($this->countAllEmails > 0) {
             $this->sentEmails = $this->db->get_results($query, true);
@@ -86,14 +86,36 @@ class VoyoEmailsUnactiveJob
         }
     }
 
+    protected function setUnactive($email)
+    {
+        $this->db->update(
+                'dnt_mailer_mails',
+                array(
+                    'show' => 0,
+                    'parent_id' => 1,
+                    'datetime_update' => $this->dnt->datetime()
+                ),
+                array(
+                    'cat_id' => $this->emailCatId,
+                    'email' => $email,
+                    'vendor_id' => $this->vendor->getId())
+        );
+    }
+
     public function run()
     {
         $this->init();
         $this->compare();
+
         foreach ($this->unactiveEmails as $email) {
+            //if($email == 'papcunmvp@gmail.com'){
+            $this->setUnactive($email);
+            //var_dump($email);
+            //}
+            //exit;
             //echo $email.'<br/>';
         }
-        var_dump(count($this->unactiveEmails));
+        print ('deleted mails: ' . count($this->unactiveEmails));
     }
 
 }
