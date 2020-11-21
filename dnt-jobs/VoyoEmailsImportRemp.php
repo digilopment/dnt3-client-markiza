@@ -2,7 +2,6 @@
 
 namespace DntJobs;
 
-use App\EasyCrypt;
 use DntLibrary\Base\DB;
 use DntLibrary\Base\Dnt;
 use DntLibrary\Base\Settings;
@@ -12,20 +11,13 @@ class VoyoEmailsImportRempJob
 
     const CAT_ID = 91;
     const VENDOR_ID = 39;
-    const API_LIMIT = 5000;
     const DELETE_PERIOD = 2;
 
     protected $settings;
     protected $dnt;
     protected $db;
-    protected $crypt;
     protected $dbEmails = [];
     protected $jsonEmails = [];
-    protected $voyoService;
-    protected $serviceLogin;
-    protected $servicePsswd;
-    protected $decryptedKey;
-    protected $firstId;
 
     public function __construct()
     {
@@ -34,7 +26,6 @@ class VoyoEmailsImportRempJob
         $this->rempBareerToken = $this->settings->getGlobals()->vendor['rempBareerToken'];
         $this->dnt = new Dnt();
         $this->db = new DB();
-        $this->crypt = new EasyCrypt($this->decryptedKey);
     }
 
     protected function getData()
@@ -96,7 +87,8 @@ class VoyoEmailsImportRempJob
      */
     protected function newEmails()
     {
-        $this->jsonEmails = json_decode($this->getData());
+        $json = json_decode($this->getData(), true);
+        $this->jsonEmails = $json['users'];
     }
 
     /**
@@ -105,9 +97,18 @@ class VoyoEmailsImportRempJob
      */
     protected function writeToDb($item)
     {
-        $name = str_replace('?', 'c', $item['name']);
-        $surname = str_replace('?', 'c', $item['surname']);
-        $nickname = $item['nickname'];
+        $name = '';
+        $surname = '';
+        $nickname = '';
+        if (isset($item['name'])) {
+            $name = str_replace('?', 'c', $item['name']);
+        }
+        if (isset($item['surname'])) {
+            $surname = str_replace('?', 'c', $item['surname']);
+        }
+        if (isset($item['nickname'])) {
+            $nickname = $item['nickname'];
+        }
         $email = $item['email'];
 
         $insertedData = array(
@@ -134,17 +135,18 @@ class VoyoEmailsImportRempJob
     public function run()
     {
         $this->init();
-        var_dump($this->jsonEmails);
-        exit;
         print('count: ' . count($this->jsonEmails) . '<br/><br/>');
+        $new = 0;
         foreach ($this->jsonEmails as $item) {
             if (!in_array($item['email'], $this->dbEmails)) {
+                $new++;
                 $this->writeToDb($item);
-                print ($item['id'] . ' - ' . $item['nickname'] . ' - ' . $item['email'] . ' nie je v databaze a bol zapisany do DB<br/>');
+                //print ($item['email'] . ' nie je v databaze a bol zapisany do DB<br/>');
             } else {
-                print ($item['id'] . ' - ' . $item['nickname'] . ' - ' . $item['email'] . ' EXISTUJE alebo je DUPLIKAT<br/>');
+                //print ($item['email'] . ' EXISTUJE alebo je DUPLIKAT<br/>');
             }
         }
+        echo 'New emails: ' . $new;
     }
 
 }
