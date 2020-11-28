@@ -10,7 +10,7 @@ use DntLibrary\Base\Dnt;
 class VoyoEmailsUnactiveJob
 {
 
-    const UNACTIVE_PERIOD = 27; //DAYS
+    const UNACTIVE_PERIOD = 28; //DAYS
 
     protected $emailCatId = 91;
     protected $db;
@@ -86,36 +86,45 @@ class VoyoEmailsUnactiveJob
         }
     }
 
-    protected function setUnactive($email)
+    protected function setUnactive($emails)
     {
-        $this->db->update(
-                'dnt_mailer_mails',
-                array(
-                    'show' => 0,
-                    'parent_id' => 1,
-                    'datetime_update' => $this->dnt->datetime()
-                ),
-                array(
-                    'cat_id' => $this->emailCatId,
-                    'email' => $email,
-                    'vendor_id' => $this->vendor->getId())
-        );
+
+        foreach ($emails as $email) {
+            $this->db->update(
+                    'dnt_mailer_mails',
+                    array(
+                        'show' => 0,
+                        'parent_id' => 1,
+                        'datetime_update' => $this->dnt->datetime()
+                    ),
+                    array(
+                        'cat_id' => $this->emailCatId,
+                        'email' => $email,
+                        'vendor_id' => $this->vendor->getId())
+            );
+        }
+    }
+
+    public function updateUnactive($emails)
+    {
+
+        $updateEmails = [];
+        foreach ($emails as $email) {
+            $updateEmails[] = "`email` = '" . $email . "'";
+        }
+        if (count($updateEmails) > 0) {
+            $query = 'UPDATE `dnt_mailer_mails` SET `show` = 0, `parent_id` = 1, `datetime_update` = NOW() WHERE `cat_id` = ' . $this->emailCatId . ' AND `vendor_id` = ' . $this->vendor->getId() . ' AND (' . join(' OR ', $updateEmails) . ')';
+            $this->db->query($query);
+        }
     }
 
     public function run()
     {
         $this->init();
         $this->compare();
-
-        foreach ($this->unactiveEmails as $email) {
-            //if($email == 'papcunmvp@gmail.com'){
-            $this->setUnactive($email);
-            //var_dump($email);
-            //}
-            //exit;
-            //echo $email.'<br/>';
-        }
-        print ('deleted mails: ' . count($this->unactiveEmails));
+        $this->updateUnactive($this->unactiveEmails);
+        //$this->setUnactive($this->unactiveEmails);
+        print ('<br/>deleted emails: ' . count($this->unactiveEmails));
     }
 
 }
