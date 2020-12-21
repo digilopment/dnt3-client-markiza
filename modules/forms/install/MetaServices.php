@@ -8,7 +8,12 @@ class MetaServices
 {
 
     protected $content = 'Content';
-
+	
+	 public function __construct()
+    {
+        $this->vendor = new Vendor();
+    }
+	
     public function init($postId, $service)
     {
         $defaultContent = $this->content;
@@ -16,7 +21,7 @@ class MetaServices
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
-            '`vendor_id`' => Vendor::getId(),
+            '`vendor_id`' => $this->vendor->getId(),
             '`key`' => "dynamic_subject",
             '`value`' => 'Voliteľný text',
             '`content_type`' => "text",
@@ -29,7 +34,7 @@ class MetaServices
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
-            '`vendor_id`' => Vendor::getId(),
+            '`vendor_id`' => $this->vendor->getId(),
             '`key`' => "form_base_name",
             '`value`' => 'Vaše meno',
             '`content_type`' => "text",
@@ -41,7 +46,7 @@ class MetaServices
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
-            '`vendor_id`' => Vendor::getId(),
+            '`vendor_id`' => $this->vendor->getId(),
             '`key`' => "form_base_surname",
             '`value`' => 'Vaše priezvisko',
             '`content_type`' => "text",
@@ -53,7 +58,7 @@ class MetaServices
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
-            '`vendor_id`' => Vendor::getId(),
+            '`vendor_id`' => $this->vendor->getId(),
             '`key`' => "form_base_email",
             '`value`' => 'E-mailová adresa',
             '`content_type`' => "text",
@@ -65,7 +70,7 @@ class MetaServices
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
-            '`vendor_id`' => Vendor::getId(),
+            '`vendor_id`' => $this->vendor->getId(),
             '`key`' => "form_base_tel_c",
             '`value`' => 'Telefónne číslo',
             '`content_type`' => "text",
@@ -77,7 +82,7 @@ class MetaServices
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
-            '`vendor_id`' => Vendor::getId(),
+            '`vendor_id`' => $this->vendor->getId(),
             '`key`' => "form_base_adresa",
             '`value`' => 'Adresa',
             '`content_type`' => "text",
@@ -90,7 +95,7 @@ class MetaServices
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
-            '`vendor_id`' => Vendor::getId(),
+            '`vendor_id`' => $this->vendor->getId(),
             '`key`' => "form_custom_input_1",
             '`value`' => 'Voliteľné pole',
             '`content_type`' => "text",
@@ -103,7 +108,7 @@ class MetaServices
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
-            '`vendor_id`' => Vendor::getId(),
+            '`vendor_id`' => $this->vendor->getId(),
             '`key`' => "message",
             '`value`' => "Odkaz pre nás",
             '`content_type`' => "text",
@@ -116,7 +121,7 @@ class MetaServices
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
-            '`vendor_id`' => Vendor::getId(),
+            '`vendor_id`' => $this->vendor->getId(),
             '`key`' => "form_user_image_1",
             '`value`' => "Prílohy",
             '`content_type`' => "text",
@@ -129,7 +134,7 @@ class MetaServices
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
-            '`vendor_id`' => Vendor::getId(),
+            '`vendor_id`' => $this->vendor->getId(),
             '`key`' => "white_list_extensions",
             '`value`' => "image/*,video/*",
             '`content_type`' => "text",
@@ -142,7 +147,7 @@ class MetaServices
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
-            '`vendor_id`' => Vendor::getId(),
+            '`vendor_id`' => $this->vendor->getId(),
             '`key`' => "video_link",
             '`value`' => "Prosím vložte odkaz na Vaše videos",
             '`content_type`' => "text",
@@ -155,7 +160,7 @@ class MetaServices
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
-            '`vendor_id`' => Vendor::getId(),
+            '`vendor_id`' => $this->vendor->getId(),
             '`key`' => "form_file_podmienky_1",
             '`value`' => "",
             '`content_type`' => "text",
@@ -168,7 +173,7 @@ class MetaServices
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
-            '`vendor_id`' => Vendor::getId(),
+            '`vendor_id`' => $this->vendor->getId(),
             '`key`' => "form_file_podmienky_2",
             '`value`' => "",
             '`content_type`' => "text",
@@ -181,7 +186,7 @@ class MetaServices
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
-            '`vendor_id`' => Vendor::getId(),
+            '`vendor_id`' => $this->vendor->getId(),
             '`key`' => "form_file_podmienky_3",
             '`value`' => "",
             '`content_type`' => "text",
@@ -194,7 +199,7 @@ class MetaServices
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
-            '`vendor_id`' => Vendor::getId(),
+            '`vendor_id`' => $this->vendor->getId(),
             '`key`' => "form_file_podmienky_4",
             '`value`' => "",
             '`content_type`' => "text",
@@ -207,7 +212,7 @@ class MetaServices
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
-            '`vendor_id`' => Vendor::getId(),
+            '`vendor_id`' => $this->vendor->getId(),
             '`key`' => "form_file_info_1",
             '`value`' => "",
             '`content_type`' => "text",
@@ -220,7 +225,7 @@ class MetaServices
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
-            '`vendor_id`' => Vendor::getId(),
+            '`vendor_id`' => $this->vendor->getId(),
             '`key`' => "ajax_url",
             '`value`' => "",
             '`content_type`' => "text",
@@ -234,7 +239,7 @@ class MetaServices
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
-            '`vendor_id`' => Vendor::getId(),
+            '`vendor_id`' => $this->vendor->getId(),
             '`key`' => "content",
             '`value`' => "Toto je content článku s formulárom",
             '`content_type`' => "text",
@@ -247,7 +252,7 @@ class MetaServices
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
-            '`vendor_id`' => Vendor::getId(),
+            '`vendor_id`' => $this->vendor->getId(),
             '`key`' => "perex",
             '`value`' => "Toto je perex",
             '`content_type`' => "text",
@@ -260,7 +265,7 @@ class MetaServices
         $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
-            '`vendor_id`' => Vendor::getId(),
+            '`vendor_id`' => $this->vendor->getId(),
             '`key`' => "color",
             '`value`' => "Farba warnings",
             '`content_type`' => "text",
@@ -273,7 +278,7 @@ class MetaServices
          $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
-            '`vendor_id`' => Vendor::getId(),
+            '`vendor_id`' => $this->vendor->getId(),
             '`key`' => "color_error",
             '`value`' => "#ff0000",
             '`content_type`' => "color",
@@ -286,7 +291,7 @@ class MetaServices
           $insertedData[] = array(
             '`post_id`' => $postId,
             '`service`' => $service,
-            '`vendor_id`' => Vendor::getId(),
+            '`vendor_id`' => $this->vendor->getId(),
             '`key`' => "color",
             '`value`' => "#000000",
             '`content_type`' => "color",

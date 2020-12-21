@@ -1,13 +1,11 @@
 <?php
 
-use DntLibrary\Base\Dnt;
-use DntLibrary\Base\Frontend;
-use DntLibrary\Base\MultyLanguage;
 
-$data = Frontend::get();
+$dnt = $data['dnt'];
+$multiLanguage = $data['multiLanguage'];
 $FORM_BASE_VALUE = array();
 foreach (array_keys($data['meta_tree']['keys']) as $key) {
-    if (Dnt::in_string("form_base", $key)) {
+    if ($dnt->in_string("form_base", $key)) {
         if ($data['meta_tree']['keys'][$key]['show'] == 1) {
             $keyName = str_replace('form_base_', '', $key);
             $keyName = str_replace('name', 'meno', $keyName);
@@ -19,7 +17,7 @@ foreach (array_keys($data['meta_tree']['keys']) as $key) {
 
 $FORM_CUSTOM_VALUE = array();
 foreach (array_keys($data['meta_tree']['keys']) as $key) {
-    if (Dnt::in_string("form_custom", $key)) {
+    if ($dnt->in_string("form_custom", $key)) {
         if ($data['meta_tree']['keys'][$key]['show'] == 1) {
             $FORM_CUSTOM_VALUE[$key] = $data['meta_tree']['keys'][$key];
         }
@@ -32,7 +30,7 @@ $arrayExtension = [
     'video' => 'webm,mpg,mp2,mpeg,mpe,mpv,ogg,mp4,m4p,m4v,avi,wmv,mov,qt,flv,swf,avchd,m4a,f4v,f4a,m4b,m4r,f4b,3gp,3gp2,3g2,3gpp,3gpp2,oga,ogv,ogx,wma'
 ];
 $final = [];
-foreach (explode(',', str_replace('-', ',', Dnt::name_url($accept))) as $format) {
+foreach (explode(',', str_replace('-', ',', $dnt->name_url($accept))) as $format) {
     if (in_array($format, array_keys($arrayExtension))) {
         $final[] = $arrayExtension[$format];
     }

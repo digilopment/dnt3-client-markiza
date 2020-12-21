@@ -15,6 +15,7 @@ class Configurator
     {
         (new Autoloader)->addVendroClass(__FILE__, 'MarkizaForm');
         $this->webhook = new Webhook();
+        $this->vendor = new Vendor();
     }
 
     public function vendorConfig()
@@ -100,7 +101,7 @@ class Configurator
             '`value`' => '',
             '`content_type`' => 'text',
             '`description`' => 'Automatické odosielanie voucherov',
-            '`vendor_id`' => Vendor::getId(),
+            '`vendor_id`' => $this->vendor->getId(),
             '`show`' => '0',
             '`order`' => '10',
         );

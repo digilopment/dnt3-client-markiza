@@ -14,6 +14,7 @@ class DefaultController extends BaseController
 
     public function __construct()
     {
+		parent::__construct();
         $this->dnt = new Dnt();
         $this->frontend = new Frontend();
     }
