@@ -13,15 +13,18 @@ class FormPluginControll extends Plugin
     protected $markiza;
     protected $frontend;
 
-    public function __construct()
+    public function __construct($data, $pluginId)
     {
+        parent::__construct($data, $pluginId);
+		$this->data = $data;
         $this->markiza = new MarkizaForm();
         $this->frontend = new Frontend();
     }
 
     public function run()
     {
-        $html = $this->layout($this->loc, 'form', false, true);
+		$data = $this->data;
+        $html = $this->layout($this->loc, 'form', $data, true);
         print $this->markiza->getHybsaTemplate($html);
     }
 

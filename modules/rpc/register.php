@@ -28,9 +28,12 @@ function reArrayFiles(&$file_post)
 $rest = new Rest;
 $db = new DB;
 $dntMailer = new Mailer;
+$frontend = new Frontend;
+$dnt = new Dnt;
+$vendor = new Vendor;
 
 $postId = $rest->webhook(4);
-$data = Frontend::get(false, $postId);
+$data = $this->frontend->get(false, $postId);
 $formName = $data['article']['name'];
 $siteKey = $data['meta_settings']['keys']['gc_site_key']['value'];
 $secretKey = $data['meta_settings']['keys']['gc_secret_key']['value'];
@@ -74,7 +77,7 @@ if (!empty($meno) && !empty($priezvisko)) {
             $dntUpload = new Upload($file);
             //pracuje s ajaxom VIDEA
             if ($dntUpload->uploaded) {
-                $dntUpload->file_new_name_body = Vendor::getId() . "_" . md5(time()) . "_o";
+                $dntUpload->file_new_name_body = $this->vendor->getId() . "_" . md5(time()) . "_o";
                 // save uploaded image with no changes
                 $dntUpload->Process($myPath);
                 if ($dntUpload->processed) {
@@ -122,9 +125,9 @@ if (!empty($meno) && !empty($priezvisko)) {
 
         $table = "dnt_registred_users";
 
-        $insertedData["`type`"] = Dnt::name_url($formName) . "-" . $postId;
-        $insertedData["`vendor_id`"] = Vendor::getId();
-        $insertedData["`datetime_creat`"] = Dnt::datetime();
+        $insertedData["`type`"] = $this->dnt->name_url($formName) . "-" . $postId;
+        $insertedData["`vendor_id`"] = $this->vendor->getId();
+        $insertedData["`datetime_creat`"] = $this->dnt->datetime();
 
 
         $insertedData["`name`"] = $meno;
@@ -142,12 +145,12 @@ if (!empty($meno) && !empty($priezvisko)) {
         $insertedData["`status`"] = 1;
 
 
-        $insertedData["`ip_adresa`"] = Dnt::get_ip();
+        $insertedData["`ip_adresa`"] = $this->dnt->get_ip();
         //$insertedData["`img`"] 			= $prilohy;
 
         $db->dbTransaction();
         $db->insert($table, $insertedData);
-        $userId = Dnt::getLastId($table);
+        $userId = $this->dnt->getLastId($table);
         $db->dbcommit();
 
 

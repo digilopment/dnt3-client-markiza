@@ -1,13 +1,15 @@
 <?php
 
+use DntLibrary\Base\Dnt;
 use DntLibrary\Base\Frontend;
 
-$data = Frontend::get();
-//var_dump($data);
+$dnt = new Dnt();
+$frontend = new Frontend();
+$data = $frontend->get();
 
-$postData = Frontend::getDeafult($data, "article");
-if (dnt::not_html($postData['perex'])) {
-    echo dnt::not_html($postData['perex']);
+$postData = $frontend->getDeafult($data, "article");
+if ($dnt->not_html($postData['perex'])) {
+    echo $dnt->not_html($postData['perex']);
 } else {
     echo $postData['content'];
 }

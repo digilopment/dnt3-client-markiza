@@ -28,6 +28,9 @@ class CompetitionRegister
 
     public function __construct()
     {
+        $this->vendor = new Vendor();
+        $this->dnt = new Dnt();
+        $this->frontend = new Frontend();
         $this->rest = new Rest();
         $this->db = new DB();
         $this->dntMailer = new Mailer();
@@ -55,7 +58,7 @@ class CompetitionRegister
     protected function init()
     {
         $this->postId = $this->rest->webhook(4);
-        $this->data = Frontend::get(false, $this->postId);
+        $this->data = $this->frontend->get(false, $this->postId);
     }
 
     protected function noCaptcha()
@@ -143,8 +146,8 @@ class CompetitionRegister
                     </html>';
 
             $insertedData["`type`"] = "competitor-user";
-            $insertedData["`vendor_id`"] = Vendor::getId();
-            $insertedData["`datetime_creat`"] = Dnt::datetime();
+            $insertedData["`vendor_id`"] = $this->vendor->getId();
+            $insertedData["`datetime_creat`"] = $this->dnt->datetime();
             $insertedData["`name`"] = $form_base_name;
             $insertedData["`surname`"] = $form_base_surname;
             $insertedData["`session_id`"] = uniqid();
@@ -153,7 +156,7 @@ class CompetitionRegister
             $insertedData["`tel_c`"] = $form_base_tel_c;
             $insertedData["`ulica`"] = $form_base_adresa;
             $insertedData["`podmienky`"] = ($podmienky1 && $podmienky2) ? 1 : 0;
-            $insertedData["`ip_adresa`"] = Dnt::get_ip();
+            $insertedData["`ip_adresa`"] = $this->dnt->get_ip();
             $insertedData["`img`"] = $attachment0;
             $insertedData["`status`"] = 1;
 
