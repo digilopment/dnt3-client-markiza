@@ -104,6 +104,37 @@ class Configurator
             '`description`' => 'Automatické odosielanie voucherov',
             '`vendor_id`' => $this->vendor->getId(),
             '`show`' => '0',
+            '`order`' => '150',
+        );
+        
+        $insertedData[] = array(
+            '`type`' => 'keys',
+            '`key`' => 'smtp_host',
+            '`value`' => 'smtp.gmail.com',
+            '`content_type`' => 'text',
+            '`description`' => 'SMTP Host',
+            '`vendor_id`' => $this->vendor->getId(),
+            '`show`' => '1',
+            '`order`' => '160',
+        );
+        $insertedData[] = array(
+            '`type`' => 'keys',
+            '`key`' => 'smtp_username',
+            '`value`' => '',
+            '`content_type`' => 'text',
+            '`description`' => 'SMTP User name (email)',
+            '`vendor_id`' => $this->vendor->getId(),
+            '`show`' => '1',
+            '`order`' => '170',
+        );
+        $insertedData[] = array(
+            '`type`' => 'keys',
+            '`key`' => 'smtp_password',
+            '`value`' => '',
+            '`content_type`' => 'text',
+            '`description`' => 'SMTP heslo',
+            '`vendor_id`' => $this->vendor->getId(),
+            '`show`' => '1',
             '`order`' => '10',
         );
 
