@@ -31,6 +31,8 @@ class Configurator
             'rempService' => 'https://crm.cms.markiza.sk/api/v1/user-segments/users?code=newsletters-gdpr-ready',
             'crmService' => 'https://crm.cms.markiza.sk/api/v1/user-segments/users?code=',
             'rempBareerToken' => '496f34c82af4bfc72a663595602757e3',
+            'datacruitLogin' => 'web@markiza.sk',
+            'datacruitPassword' => 'lq!j73Hkw_kq3B',
         ];
     }
 
@@ -106,7 +108,7 @@ class Configurator
             '`show`' => '0',
             '`order`' => '150',
         );
-        
+
         $insertedData[] = array(
             '`type`' => 'keys',
             '`key`' => 'smtp_host',
