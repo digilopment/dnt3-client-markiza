@@ -6,6 +6,7 @@ use DntLibrary\Base\DB;
 use DntLibrary\Base\Rest;
 use DntLibrary\Base\Vendor;
 use DntLibrary\Base\Dnt;
+use mysqli;
 
 class VoyoEmailsUnactiveJob
 {
@@ -39,20 +40,31 @@ class VoyoEmailsUnactiveJob
 
     protected function getLogs()
     {
-        $logs = [];
+        $link = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $query = "SELECT msg FROM `dnt_logs` WHERE (`system_status` = 'newsletter_log_seen' OR `system_status` = 'newsletter_log_click') AND vendor_id = '" . $this->vendor->getId() . "'";
-        $this->countLogs = $this->db->num_rows($query);
-        if ($this->countLogs > 0) {
-            $logs = $this->db->get_results($query, true);
+
+        $data = [];
+        if ($stmt = mysqli_prepare($link, $query)) {
+            mysqli_stmt_execute($stmt);
+            mysqli_stmt_bind_result($stmt, $msg);
+            while (mysqli_stmt_fetch($stmt)) {
+                $data[] = $msg;
+            }
+            mysqli_stmt_close($stmt);
+        } else {
+            print('no data');
         }
-        $this->logs = $logs;
+
+        $countTotalLogs = count($data);
+        $this->countLogs = $countTotalLogs;
+        $this->logs = $data;
     }
 
     protected function emailsInLogs()
     {
         $emails = [];
         foreach ($this->logs as $log) {
-            $email = isset(json_decode($log->msg)->email) ? json_decode($log->msg)->email : false;
+            $email = isset(json_decode($log)->email) ? json_decode($log)->email : false;
             $emails[$email] = $email;
         }
         $this->emailsInLogs = $emails;
@@ -86,25 +98,6 @@ class VoyoEmailsUnactiveJob
         }
     }
 
-    protected function setUnactive($emails)
-    {
-
-        foreach ($emails as $email) {
-            $this->db->update(
-                    'dnt_mailer_mails',
-                    array(
-                        'show' => 0,
-                        'parent_id' => 1,
-                        'datetime_update' => $this->dnt->datetime()
-                    ),
-                    array(
-                        'cat_id' => $this->emailCatId,
-                        'email' => $email,
-                        'vendor_id' => $this->vendor->getId())
-            );
-        }
-    }
-
     public function updateUnactive($emails)
     {
 
@@ -123,8 +116,8 @@ class VoyoEmailsUnactiveJob
         $this->init();
         $this->compare();
         $this->updateUnactive($this->unactiveEmails);
-        //$this->setUnactive($this->unactiveEmails);
-        print ('<br/>deleted emails: ' . count($this->unactiveEmails));
+
+        print ('<br/>set as unactive emails: ' . count($this->unactiveEmails) . ' - ALL emails in database: ' . $this->countAllEmails);
     }
 
 }

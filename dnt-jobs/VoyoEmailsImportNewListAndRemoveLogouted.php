@@ -30,7 +30,7 @@ class VoyoEmailsImportNewListAndRemoveLogoutedJob
         $this->vendor = new Vendor();
         $this->dnt = new Dnt();
         $this->settings = new Settings();
-        $this->rempService = $this->settings->getGlobals()->vendor['crmService'] . self::INSERT_TO_CAT;
+        $this->rempService = $this->settings->getGlobals()->vendor['crmService'] . self::CRM_ID;
         $this->rempBareerToken = $this->settings->getGlobals()->vendor['rempBareerToken'];
     }
 
@@ -126,7 +126,7 @@ class VoyoEmailsImportNewListAndRemoveLogoutedJob
 
     public function run()
     {
-        exit;
+        //exit;
         $this->init();
         $this->compare();
 
