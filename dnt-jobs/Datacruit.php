@@ -16,6 +16,10 @@ class DatacruitJob
     public function __construct()
     {
         $this->settings = new Settings();
+    }
+
+    protected function beforeInit()
+    {
         $this->error = false;
         $this->responseCode = false;
         $this->jobCategories = [];
@@ -247,6 +251,7 @@ class DatacruitJob
 
     public function run()
     {
+        $this->beforeInit();
         $this->init();
         $this->renderWithJson();
     }
