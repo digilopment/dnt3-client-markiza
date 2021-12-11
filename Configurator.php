@@ -26,7 +26,7 @@ class Configurator
             'serviceLogin' => 'mklepoch',
             'servicePsswd' => 'martin 650',
             'decryptedKey' => 'Voyo2020MarkizaDevTem',
-            'sentMailPerRequest' => 50,
+            'sentMailPerRequest' => 60,
             'unsubscribeDomain' => 'https://odhlasenie.markiza.sk/',
             'rempService' => 'https://crm.cms.markiza.sk/api/v1/user-segments/users?code=newsletters-gdpr-ready',
             'crmService' => 'https://crm.cms.markiza.sk/api/v1/user-segments/users?code=',

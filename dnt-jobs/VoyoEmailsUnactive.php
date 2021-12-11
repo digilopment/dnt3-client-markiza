@@ -11,15 +11,16 @@ use mysqli;
 class VoyoEmailsUnactiveJob
 {
 
-    const UNACTIVE_PERIOD = 28; //DAYS
+    const UNACTIVE_PERIOD = 20; //DAYS
 
     protected $emailCatId = 91;
     protected $db;
-    protected $dnt;
     protected $vendor;
+    protected $countAllEmails;
     protected $logs = [];
     protected $sentEmails = [];
-    protected $activeEmails = [];
+    protected $allEmails = [];
+    protected $showEmails = [];
     protected $unactiveEmails = [];
 
     public function __construct()
@@ -27,13 +28,14 @@ class VoyoEmailsUnactiveJob
         $this->db = new DB();
         $this->rest = new Rest();
         $this->vendor = new Vendor();
-        $this->dnt = new Dnt();
     }
 
     protected function init()
     {
         $this->emailCatId = ($this->rest->get('emailCatId')) ? $this->rest->get('emailCatId') : $this->emailCatId;
         $this->getLogs();
+        $this->allEmails();
+        $this->showEmails();
         $this->sentEmails();
         $this->emailsInLogs();
     }
@@ -41,8 +43,7 @@ class VoyoEmailsUnactiveJob
     protected function getLogs()
     {
         $link = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-        $query = "SELECT msg FROM `dnt_logs` WHERE (`system_status` = 'newsletter_log_seen' OR `system_status` = 'newsletter_log_click') AND vendor_id = '" . $this->vendor->getId() . "'";
-
+        $query = "SELECT DISTINCT msg FROM `dnt_logs` WHERE vendor_id = '" . $this->vendor->getId() . "'";
         $data = [];
         if ($stmt = mysqli_prepare($link, $query)) {
             mysqli_stmt_execute($stmt);
@@ -64,38 +65,95 @@ class VoyoEmailsUnactiveJob
     {
         $emails = [];
         foreach ($this->logs as $log) {
-            $email = isset(json_decode($log)->email) ? json_decode($log)->email : false;
-            $emails[$email] = $email;
+            $json = json_decode($log);
+            $email = isset($json->email) ? $json->email : false;
+            $emails[$email] = strtolower($email);
         }
         $this->emailsInLogs = $emails;
     }
 
-    protected function isActive($email)
-    {
-        if (in_array($email, $this->emailsInLogs)) {
-            return true;
-        }
-        return false;
-    }
-
     protected function sentEmails()
     {
+
+
+        $link = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $query = "SELECT email FROM `dnt_mailer_mails` WHERE  `vendor_id` = '" . $this->vendor->getId() . "'  AND  cat_id = '" . $this->emailCatId . "' AND `show` = 1 AND datetime_creat < DATE_SUB(NOW(),INTERVAL " . self::UNACTIVE_PERIOD . " DAY)";
-        $this->countAllEmails = $this->db->num_rows($query);
-        if ($this->countAllEmails > 0) {
-            $this->sentEmails = $this->db->get_results($query, true);
+        $data = [];
+        if ($stmt = mysqli_prepare($link, $query)) {
+            mysqli_stmt_execute($stmt);
+            mysqli_stmt_bind_result($stmt, $email);
+            while (mysqli_stmt_fetch($stmt)) {
+                $data[] = $email;
+            }
+            mysqli_stmt_close($stmt);
+        } else {
+            print('no data');
         }
+        $this->sentEmails = $data;
+    }
+
+    protected function allEmails()
+    {
+        $link = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+        $query = "SELECT email FROM `dnt_mailer_mails` WHERE  `vendor_id` = '" . $this->vendor->getId() . "'  AND  cat_id = '" . $this->emailCatId . "'";
+
+        $data = [];
+        if ($stmt = mysqli_prepare($link, $query)) {
+            mysqli_stmt_execute($stmt);
+            mysqli_stmt_bind_result($stmt, $email);
+            while (mysqli_stmt_fetch($stmt)) {
+                $data[] = $email;
+            }
+            mysqli_stmt_close($stmt);
+        } else {
+            print('no data');
+        }
+        $this->allEamils = $data;
+    }
+
+    protected function showEmails()
+    {
+        $link = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+        $query = "SELECT email FROM `dnt_mailer_mails` WHERE  `vendor_id` = '" . $this->vendor->getId() . "'  AND  cat_id = '" . $this->emailCatId . "' AND `show` = '1'";
+
+        $data = [];
+        if ($stmt = mysqli_prepare($link, $query)) {
+            mysqli_stmt_execute($stmt);
+            mysqli_stmt_bind_result($stmt, $email);
+            while (mysqli_stmt_fetch($stmt)) {
+                $data[] = $email;
+            }
+            mysqli_stmt_close($stmt);
+        } else {
+            print('no data');
+        }
+        $this->countAllEmails = count($data);
+        $this->showEmails = $data;
     }
 
     protected function compare()
     {
-        foreach ($this->sentEmails as $email) {
-            if ($this->isActive($email->email)) {
-                $this->activeEmails[] = $email->email;
-            } else {
-                $this->unactiveEmails[] = $email->email;
+
+        $inLogs = [];
+        foreach ($this->emailsInLogs as $l) {
+            $inLogs[] = $l;
+        }
+
+        $check = array_count_values(array_merge($this->sentEmails, $inLogs));
+        $allUnactive = [];
+        foreach ($check as $email => $val) {
+            if ($val == 1) {
+                $allUnactive[] = $email;
             }
         }
+        $check2 = array_count_values(array_merge($allUnactive, $this->showEmails));
+        $unactive = [];
+        foreach ($check2 as $email => $val) {
+            if ($val > 1) {
+                $unactive[] = $email;
+            }
+        }
+        $this->unactiveEmails = $unactive;
     }
 
     public function updateUnactive($emails)
@@ -107,7 +165,7 @@ class VoyoEmailsUnactiveJob
         }
         if (count($updateEmails) > 0) {
             $query = 'UPDATE `dnt_mailer_mails` SET `show` = 0, `parent_id` = 1, `datetime_update` = NOW() WHERE `cat_id` = ' . $this->emailCatId . ' AND `vendor_id` = ' . $this->vendor->getId() . ' AND (' . join(' OR ', $updateEmails) . ')';
-            $this->db->query($query);
+            //$this->db->query($query);
         }
     }
 
@@ -117,7 +175,11 @@ class VoyoEmailsUnactiveJob
         $this->compare();
         $this->updateUnactive($this->unactiveEmails);
 
-        print ('<br/>set as unactive emails: ' . count($this->unactiveEmails) . ' - ALL emails in database: ' . $this->countAllEmails);
+        $cUnactive = count($this->unactiveEmails);
+
+        print( 'Comperation emails: ' . count($this->sentEmails) . '<br/>');
+        print( 'Total logs: ' . $this->countLogs . '<br/>');
+        print('<br/>set as unactive emails: ' . $cUnactive . ' - ALL active emails in database: ' . round($this->countAllEmails - $cUnactive));
     }
 
 }

@@ -9,6 +9,7 @@ class DatacruitJob
 {
 
     const SERVICE = 'https://api.datacruit.com/advertising/jobAds';
+    const SERVICE_DETAIL = 'https://private-anon-b3b79791f0-datacruitatsapi.apiary-proxy.com/advertising/jobAds/';
     const DEFAULT_IMAGE = 'https://static.markiza.sk/a501/image/file/1/1409/xSqc.jpg';
     const PROFESIA_URL = 'https://www.profesia.sk/send_cv.php?offer_id=';
     const STATIC_FILE = 'data/datacruit.json';
@@ -42,7 +43,12 @@ class DatacruitJob
             '2D a 3D motion grafický dizajnér' => [
                 'img' => 'https://static.markiza.sk/a501/image/file/2/1844/Q5um.2da3dmotiongrafickydizajner_jpg.jpg',
                 'cat' => 'default',
-                'pId' => 4178322,
+                //'pId' => 4178322,
+            ],
+			'Koordinátor reklamných spotov' => [
+                'img' => 'https://static.markiza.sk/a501/image/file/2/1846/7xyH.pozicia_koordinator_reklamnych_spotov_2_jpg.jpg',
+                'cat' => 'default',
+                //'pId' => 4188160,
             ],
         ];
 
@@ -80,7 +86,7 @@ class DatacruitJob
         $this->cleanCategories = $cleanCategories;
     }
 
-    protected function clean($str)
+    protected function nameUrl($str)
     {
         $this->str = $str;
         $this->str = preg_replace('/[^\pL0-9_]+/u', '-', $this->str);
@@ -88,8 +94,12 @@ class DatacruitJob
         $this->str = @iconv('utf-8', 'ASCII//TRANSLIT', $this->str);
         $this->str = strtolower($this->str);
         $this->str = preg_replace('/[^-a-z0-9_]+/', '', $this->str);
-        $this->str = str_replace('-', '', $this->str);
         return $this->str;
+    }
+
+    protected function clean($str)
+    {
+        return str_replace('-', '', $this->nameUrl($str));
     }
 
     protected function inString($pharse, $str)
@@ -97,16 +107,23 @@ class DatacruitJob
         return preg_match('/' . $pharse . '/', $str);
     }
 
-    protected function request()
+    protected function request($id = false)
     {
         $login = $this->settings->getGlobals()->vendor['datacruitLogin'];
         $password = $this->settings->getGlobals()->vendor['datacruitPassword'];
 
         $curl = curl_init();
+
+        if ($id) {
+            $service = self::SERVICE_DETAIL . $id;
+        } else {
+            $service = self::SERVICE;
+        }
+
         curl_setopt_array($curl, array(
             CURLOPT_SSL_VERIFYPEER => 0,
             CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_URL => self::SERVICE,
+            CURLOPT_URL => $service,
             CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
             CURLOPT_USERPWD => "$login:$password"
         ));
@@ -125,6 +142,9 @@ class DatacruitJob
             $this->rawData = $rawData;
             $this->error = true;
             return;
+        }
+        if ($id) {
+            return json_decode($response);
         }
         $this->responseCode = $responseCode;
         $this->rawData = json_decode($response);
@@ -180,10 +200,77 @@ class DatacruitJob
         return null;
     }
 
+    protected function setLanguage($languageId)
+    {
+        return match ($languageId) {
+            9 => 'Angličtina',
+            5 => 'Čeština',
+            7 => 'Nemčina',
+            14 => 'Maďarčina',
+            10 => 'Španielčina',
+            27 => 'Slovenčina',
+            default => ''
+        };
+    }
+
+    protected function setLanguageLevel($languageId)
+    {
+        return match ($languageId) {
+            1 => 'A1',
+            2 => 'A2',
+            3 => 'B1',
+            4 => 'B2',
+            5 => 'C1',
+            6 => 'C2',
+            8 => 'rodný',
+            default => ''
+        };
+    }
+
+    protected function setEducation($educationId)
+    {
+        return match ($educationId) {
+            1 => 'nižšie sekundárne vzdelanie',
+            2 => 'stredné odborné vzdelanie s výučným listom',
+            3 => 'úplné stredné odborné vzdelanie s maturitou',
+            4 => 'postsekundárne vzdelanie',
+            5 => 'vysokoškolské vzdelanie I. stupeň - bakalárske',
+            10 => 'vysokoškolské vzdelanie II. stupeň',
+            12 => 'vysokoškolské vzdelanie II. stupeň - postgraduálne',
+            13 => 'vysokoškolské vzdelanie III. stupeň - doktorandské',
+            default => ''
+        };
+    }
+
+    protected function languages($languages)
+    {
+        $final = [];
+        foreach ($languages as $language) {
+            $final[] = $this->setLanguage($language);
+        }
+        return $final;
+    }
+
     protected function formatDatetime($datetime)
     {
         $entryDate = date($datetime);
         return date('d.m.Y H:i', strtotime($entryDate));
+    }
+
+    protected function loadExtendData()
+    {
+        $this->extendedData = [];
+        foreach ($this->rawData as $key => $val) {
+            $this->extendedData[$val->id] = $this->request($val->id);
+        }
+    }
+
+    protected function extendedData($val, $obj)
+    {
+        if (isset($this->extendedData[$val->id]->{$obj})) {
+            return $this->extendedData[$val->id]->{$obj};
+        }
+        return $val->{$obj};
     }
 
     protected function setData()
@@ -193,6 +280,7 @@ class DatacruitJob
             foreach ($this->rawData as $key => $val) {
                 $final[$key]['id'] = $val->id;
                 $final[$key]['title'] = $val->title;
+                $final[$key]['nameUrl'] = $this->nameUrl($val->title);
                 $final[$key]['descriptionShort'] = $val->descriptionShort;
                 $final[$key]['description'] = $val->description;
                 $final[$key]['department'] = $val->clientName;
@@ -204,10 +292,18 @@ class DatacruitJob
                 $final[$key]['dateCreated'] = $val->dateCreated;
                 $final[$key]['dateCreatedFormated'] = $this->formatDatetime($val->dateCreated);
                 $final[$key]['image'] = $this->setImage($val);
+                $final[$key]['education'] = $this->setEducation($val->education);
                 $final[$key]['category'] = $this->setCategory($val);
                 $profesiaId = $this->setProfesiaId($val);
                 $final[$key]['profesiaOfferId'] = $profesiaId;
                 $final[$key]['profesiaFormUrl'] = $this->setProfesiaFormUrl($profesiaId);
+                $final[$key]['requirements'] = $this->extendedData($val, 'requirements');
+                $final[$key]['contactFullname'] = $this->extendedData($val, 'contactFullname');
+                $final[$key]['contactEmail'] = $this->extendedData($val, 'contactEmail');
+                $final[$key]['brandImageURL'] = $this->extendedData($val, 'brandImageURL');
+                $final[$key]['brandFacebookImageURL'] = $this->extendedData($val, 'brandFacebookImageURL');
+                $final[$key]['brandLinkedInImageURL'] = $this->extendedData($val, 'brandLinkedInImageURL');
+                $final[$key]['languages'] = $this->languages($this->extendedData($val, 'languages'));
             }
         }
         $this->data = $final;
@@ -245,6 +341,7 @@ class DatacruitJob
         $this->jobPositionImages();
         $this->jobCategories();
         $this->request();
+        $this->loadExtendData();
         $this->setData();
         $this->response();
     }

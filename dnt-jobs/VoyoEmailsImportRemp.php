@@ -75,10 +75,26 @@ class VoyoEmailsImportRempJob
      */
     protected function dbEmails()
     {
+        $link = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
         $query = "SELECT email FROM `dnt_mailer_mails` WHERE cat_id = '" . self::CAT_ID . "' AND vendor_id = '" . self::VENDOR_ID . "'";
-        foreach ($this->db->get_results($query) as $row) {
-            $this->dbEmails[] = $row['email'];
+
+        $data = [];
+        if ($stmt = mysqli_prepare($link, $query)) {
+            mysqli_stmt_execute($stmt);
+            mysqli_stmt_bind_result($stmt, $email);
+            while (mysqli_stmt_fetch($stmt)) {
+                $data[] = $email;
+            }
+            mysqli_stmt_close($stmt);
+        } else {
+            print('no data');
         }
+		
+        $final = [];
+        foreach ($data as $email) {
+            $final[strtolower($email)] = strtolower($email);
+        }
+        $this->dbEmails = $final;
     }
 
     /**
@@ -88,7 +104,16 @@ class VoyoEmailsImportRempJob
     protected function newEmails()
     {
         $json = json_decode($this->getData(), true);
-        $this->jsonEmails = $json['users'];
+        $final = [];
+        $i = 0;
+        foreach ($json['users'] as $item) {
+            if ($i < 1000000) {
+				$key = strtolower($item['email']);
+                $final[$key] = $item;
+            }
+            $i++;
+        }
+        $this->jsonEmails = $final;
     }
 
     /**
@@ -109,7 +134,7 @@ class VoyoEmailsImportRempJob
         if (isset($item['nickname'])) {
             $nickname = $item['nickname'];
         }
-        $email = $item['email'];
+        $email = strtolower($item['email']);
 
         $insertedData = array(
             'name' => $name,
@@ -124,6 +149,65 @@ class VoyoEmailsImportRempJob
         );
         $this->db->insert('dnt_mailer_mails', $insertedData);
     }
+	
+	protected function createInsertData($item)
+    {
+        $name = '';
+        $surname = '';
+        $nickname = '';
+        if (isset($item['name'])) {
+            $name = str_replace('?', 'c', $item['name']);
+        }
+        if (isset($item['surname'])) {
+            $surname = str_replace('?', 'c', $item['surname']);
+        }
+        if (isset($item['nickname'])) {
+            $nickname = $item['nickname'];
+        }
+        $email = strtolower($item['email']);
+
+        $insertedData = array(
+            'name' => $name,
+            'surname' => $surname,
+            'email' => $email,
+            'title' => $nickname,
+            'vendor_id' => self::VENDOR_ID,
+            'cat_id' => self::CAT_ID,
+            '`show`' => 1,
+            'datetime_creat' => $this->dnt->datetime(),
+            'datetime_update' => $this->dnt->datetime()
+        );
+        return $insertedData;
+    }
+
+    protected function writeToDbMulti($data)
+    {
+        $fields = array(
+            'name',
+            'surname',
+            'email',
+            'title',
+            'vendor_id',
+            'cat_id',
+            'show',
+            'datetime_creat',
+            'datetime_update',
+        );
+        $records = $data;
+        if (count($data) > 0) {
+			
+			//exit;
+			/*$sql = $this->db->insert_multi('dnt_mailer_mails', $fields, $data, true);
+            $link = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+			//mysqli_begin_transaction($link);
+            $stmt = mysqli_prepare($link, $sql);
+            mysqli_stmt_execute($stmt);
+			//mysqli_commit($link);
+			
+			echo $sql;
+            $this->db->query("UPDATE `dnt_mailer_mails` SET `id_entity`= `id` WHERE id_entity = 0");*/
+        }
+    }
 
     protected function init()
     {
@@ -132,21 +216,47 @@ class VoyoEmailsImportRempJob
         $this->newEmails();
     }
 
+    
     public function run()
     {
+
         $this->init();
-        print('count: ' . count($this->jsonEmails) . '<br/><br/>');
         $new = 0;
+        $data = [];
         foreach ($this->jsonEmails as $item) {
-            if (!in_array($item['email'], $this->dbEmails)) {
-                $new++;
-                $this->writeToDb($item);
-                //print ($item['email'] . ' nie je v databaze a bol zapisany do DB<br/>');
+            if (in_array(strtolower($item['email']), $this->dbEmails)) {
+               //$data[] = $this->createInsertData($item);
             } else {
-                //print ($item['email'] . ' EXISTUJE alebo je DUPLIKAT<br/>');
+                $data[] = $this->createInsertData($item);
+                $new++;
             }
         }
-        echo 'New emails: ' . $new;
+		
+		$fields = array(
+            'name',
+            'surname',
+            'email',
+            'title',
+            'vendor_id',
+            'cat_id',
+            'show',
+            'datetime_creat',
+            'datetime_update',
+        );
+        $records = $data;
+		$sql = $this->db->insert_multi('dnt_mailer_mails', $fields, $data, true);
+		$link = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+		$stmt = mysqli_prepare($link, $sql);
+		mysqli_stmt_execute($stmt);
+		$stmt2 = mysqli_prepare($link, "UPDATE `dnt_mailer_mails` SET `id_entity`= `id` WHERE id_entity = 0");
+		mysqli_stmt_execute($stmt2);
+		//echo $sql;
+		//exit;
+        //$this->writeToDbMulti($data);
+
+        print('count JSON emails: ' . count($this->jsonEmails) . '<br/><br/>');
+        print('count DATABASE emails: ' . count($this->dbEmails) . '<br/><br/>');
+        print('New imported emails: ' . $new);
     }
 
 }
