@@ -14,6 +14,20 @@ class DatacruitJob
     const PROFESIA_URL = 'https://www.profesia.sk/send_cv.php?offer_id=';
     const STATIC_FILE = 'data/datacruit.json';
 
+    protected Settings $settings;
+    protected $error;
+    protected $responseCode;
+    protected array $jobCategories;
+    protected array $images;
+    protected array $jobsConfig;
+    protected array $cleanImages;
+    protected array $rawData;
+    protected array $data;
+    protected array $response;
+    protected string $str;
+    protected array $cleanCategories;
+    protected array $extendedData;
+
     public function __construct()
     {
         $this->settings = new Settings();
@@ -131,7 +145,6 @@ class DatacruitJob
         $response = curl_exec($curl);
         $responseCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         $error = curl_error($curl);
-        curl_close($curl);
 
         $rawData = [];
         if (($error != '') || ($responseCode != '200')) {

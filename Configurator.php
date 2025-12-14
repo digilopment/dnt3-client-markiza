@@ -10,6 +10,8 @@ class Configurator
 {
 
     protected $webhook;
+    
+    protected Vendor $vendor;
 
     public function __construct()
     {
@@ -38,12 +40,22 @@ class Configurator
 
     public function modulesRegistrator()
     {
+        // Optimalizované: načítame všetky moduly naraz v jednom SQL dotaze
+        $services = array(
+            'clean' => 'clean',
+            'forms' => 'forms',
+            'tvn_app' => 'tvn_app',
+            'subscriber' => 'subscriber',
+        );
+        
+        $sitemapModules = $this->webhook->getSitemapModulesBatch($services);
+        
         $modulesRegistrator = array(
             'clean' => array_merge(
-                    array(), $this->webhook->getSitemapModules('clean')
+                    array(), $sitemapModules['clean'] ?? array()
             ),
             'forms' => array_merge(
-                    array(), $this->webhook->getSitemapModules('forms')
+                    array(), $sitemapModules['forms'] ?? array()
             ),
             //DETAIL
             'article_view' => array_merge(
@@ -66,10 +78,10 @@ class Configurator
             ),
             //TVN APP
             'tvn_app' => array_merge(
-                    array(), $this->webhook->getSitemapModules('tvn_app')
+                    array(), $sitemapModules['tvn_app'] ?? array()
             ),
             'subscriber' => array_merge(
-                    array(), $this->webhook->getSitemapModules('subscriber')
+                    array(), $sitemapModules['subscriber'] ?? array()
             ),
         );
         return $modulesRegistrator;
